@@ -1,5 +1,8 @@
 # Put some miscellaneous rules here
 
+# ArchiDroid
+include $(BUILD_SYSTEM)/archidroid.mk
+
 # HACK: clear LOCAL_PATH from including last build target before calling
 # intermedites-dir-for
 LOCAL_PATH := $(BUILD_SYSTEM)
