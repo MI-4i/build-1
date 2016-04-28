@@ -58,11 +58,7 @@ ARCHIDROID_GCC_CPPFLAGS := $(ARCHIDROID_GCC_CFLAGS)
 #####################
 
 # Flags passed to all C targets compiled with CLANG
-ifeq (arm,$(TARGET_ARCH))
 ARCHIDROID_CLANG_CFLAGS := -O3 -Qunused-arguments -Wno-unknown-warning-option -mtune=cortex-a57 -mtune=cortex-a53
-else
-ARCHIDROID_CLANG_CFLAGS := -O3 -Qunused-arguments -Wno-unknown-warning-option -mtune=cortex-a15
-endif
 
 # Flags passed to CLANG preprocessor for C and C++
 ARCHIDROID_CLANG_CPPFLAGS := $(ARCHIDROID_CLANG_CFLAGS)
@@ -87,90 +83,26 @@ ifneq (1,$(words $(filter $(LOCAL_DISABLE_STRICT),$(LOCAL_MODULE))))
 ARCHIDROID_GCC_CFLAGS:= -fno-strict-aliasing
 endif
 
-LOCAL_DISABLE_STRICT := \
-	libc_bionic \
-	libc_dns \
-	libc_tzcode \
-	libziparchive \
-	libtwrpmtp \
-	libfusetwrp \
-	libguitwrp \
-	busybox \
-	libuclibcrpc \
-	libziparchive-host \
-	libpdfiumcore \
-	libandroid_runtime \
-	libmedia \
-	libpdfiumcore \
-	libpdfium \
-	bluetooth.default \
-	logd \
-	mdnsd \
-	net_net_gyp \
-	libstagefright_webm \
-	libaudioflinger \
-	libmediaplayerservice \
-	libstagefright \
-	ping \
-	ping6 \
-	libdiskconfig \
-	libjavacore \
-	libfdlibm \
-	libvariablespeed \
-	librtp_jni \
-	libwilhelm \
-	libdownmix \
-	libldnhncr \
-	libqcomvisualizer \
-	libvisualizer \
-	libutils \
-	libandroidfw \
-	dnsmasq \
-	static_busybox \
-	content_content_renderer_gyp \
-	third_party_WebKit_Source_modules_modules_gyp \
-	third_party_WebKit_Source_platform_blink_platform_gyp \
-	third_party_WebKit_Source_core_webcore_remaining_gyp \
-	third_party_angle_src_translator_lib_gyp \
-	third_party_WebKit_Source_core_webcore_generated_gyp \
-	libc_gdtoa \
-	libc_openbsd \
-	libc \
-	libc_nomalloc \
-	patchoat \
-	dex2oat \
-	libart \
-	libart-compiler \
-	oatdump \
-	libart-disassembler \
-	linker \
-	camera.msm8084 \
-	mm-vdec-omx-test \
-	libc_malloc \
-	libcutils \
-	liblog \
-	libbacktrace \
-        libunwind \
-        libbase \
-        libbacktrace_test \
-        backtrace_test \
-	libc_bionic_ndk \
-	libc_gdtoa \
-	libc_openbsd_ndk \
-	liblog \
-	libc \
-	libbt-brcm_stack \
-	libandroid_runtime \
-	libandroidfw \
-	libosi \
-	libnetlink \
-        libext4 \
-	clatd \
-	ip \
-        libnetlink \
-        fio\
-        tcpdump \
-	libc_nomalloc \
-	libnvvisualizer \
-	libskia \
-        libiprouteutil
+LOCAL_DISABLE_STRICT := libc_bionic libc_dns libc_tzcode libziparchive libtwrpmtp libfusetwrp libguitwrp libuclibcrpc libziparchive-host libpdfiumcore libandroid_runtime libmedia libpdfiumcore libpdfium bluetooth.default logd mdnsd net_net_gyp libstagefright_webm libaudioflinger libmediaplayerservice libstagefright ping6 ping libdiskconfig \
+	                libjavacore libfdlibm libvariablespeed librtp_jni libwilhelm libdownmix libldnhncr libqcomvisualizer libvisualizer libutils libandroidfw dnsmasq libc_gdtoa libc_openbsd libc libc_nomalloc patchoat oatdump  linker libc_malloc libcutils liblog libbacktrace clatd content_content_renderer_gyp camera.msm8084 libiprouteutil\
+			libskia libnvvisualizer libc_nomalloc tcpdump fio libnetlink ip libext4 libnetlink libosi libandroidfw libandroid_runtime libbt-brcm_stack libc liblog libc_openbsd_ndk libc_bionic_ndk libbacktrace_test libbase libunwind mm-vdec-omx-test third_party_WebKit_Source_modules_modules_gyp third_party_angle_src_translator_lib_gyp\
+			third_party_WebKit_Source_platform_blink_platform_gyp third_party_WebKit_Source_core_webcore_remaining_gyp third_party_WebKit_Source_core_webcore_generated_gyp
+
+DISABLE_ARM_MODE := libfs_mgr liblog libunwind libnetutils libziparchive libsync libusbhost libjnigraphics libstagefright_avc_common libmmcamera_interface pppd clatd libsoftkeymasterdevice sdcard logd mm-qcamera-app racoon libdiskconfig libmm-qcamera librmnetctl libjavacore camera.% libandroid_servers libmedia_jni librs_jni libhwui libandroidfw linker
+
+my_cflags += $(ARCHIDROID_GCC_CFLAGS) $(ARCHIDROID_CLANG_CFLAGS)
+
+# Force ARM Instruction Set
+ifndef LOCAL_IS_HOST_MODULE
+  ifneq (1,$(words $(filter $(DISABLE_ARM_MODE),$(LOCAL_MODULE))))
+    ifeq ($(LOCAL_ARM_MODE),)
+      LOCAL_ARM_MODE := arm
+      my_cflags += -marm
+      my_cflags :=  $(filter-out -mthumb,$(my_cflags))
+    endif
+  else
+    LOCAL_ARM_MODE := thumb
+    my_cflags += -mthumb
+    my_cflags :=  $(filter-out -marm,$(my_cflags))
+  endif
+endif
