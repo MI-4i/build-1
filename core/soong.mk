@@ -19,7 +19,7 @@ ifneq ($(wildcard $(SOONG_BOOTSTRAP)),)
     SOONG_NEEDS_REBOOTSTRAP := FORCE
     $(warning soong_out_dir changed)
   endif
-  ifneq ($(strip $(shell build/soong/reverse_path.py $(SOONG_OUT_DIR))),$(strip $(shell source $(SOONG_BOOTSTRAP); echo $$SRCDIR_FROM_BUILDDIR)))
+  ifneq ($(strip $(shell build/soong/scripts/reverse_path.py $(SOONG_OUT_DIR))),$(strip $(shell source $(SOONG_BOOTSTRAP); echo $$SRCDIR_FROM_BUILDDIR)))
     SOONG_NEEDS_REBOOTSTRAP := FORCE
     $(warning reverse path changed)
   endif
@@ -42,6 +42,8 @@ $(SOONG_VARIABLES): FORCE
 	echo '    "Brillo": $(if $(BRILLO),true,false),'; \
 	echo '    "Malloc_not_svelte": $(if $(filter true,$(MALLOC_SVELTE)),false,true),'; \
 	echo '    "Allow_missing_dependencies": $(if $(TARGET_BUILD_APPS)$(filter true,$(SOONG_ALLOW_MISSING_DEPENDENCIES)),true,false),'; \
+	echo '    "SanitizeHost": [$(if $(SANITIZE_HOST),"$(subst $(comma),"$(comma)",$(SANITIZE_HOST))")],'; \
+	echo '    "SanitizeDevice": [$(if $(SANITIZE_TARGET),"$(subst $(comma),"$(comma)",$(SANITIZE_TARGET))")],'; \
 	echo ''; \
 	echo '    "DeviceName": "$(TARGET_DEVICE)",'; \
 	echo '    "DeviceArch": "$(TARGET_ARCH)",'; \
